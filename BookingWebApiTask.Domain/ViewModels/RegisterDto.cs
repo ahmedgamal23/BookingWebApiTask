@@ -5,13 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BookingWebApiTask.Domain.Entities
+namespace BookingWebApiTask.Domain.ViewModels
 {
-    public class ApplicationUser
+    public class RegisterDto
     {
-        [Key]
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-
         [Required]
         public string Name { get; set; } = string.Empty;
 
@@ -20,6 +17,5 @@ namespace BookingWebApiTask.Domain.Entities
 
         [Required]
         public string Password { get; set; } = string.Empty;
-
     }
 }

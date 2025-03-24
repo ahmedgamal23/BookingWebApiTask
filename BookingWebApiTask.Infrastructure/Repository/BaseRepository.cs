@@ -46,15 +46,18 @@ namespace BookingWebApiTask.Infrastructure.Repository
         {
             IQueryable<T> query = _dbSet;
 
-            query = query.Where(x => x.Equals(id));
-
-            if (await query.CountAsync() == 0)
-                throw new KeyNotFoundException("Entity not found");
-
+            // Apply includes if provided
             if (include != null)
                 query = include(query);
 
-            return await query.FirstAsync();
+            // Retrieve the entity
+            var entity = await query.FirstOrDefaultAsync(e => EF.Property<TType>(e, "Id")!.Equals(id));
+
+            // Check if the entity is null
+            if (entity == null)
+                throw new KeyNotFoundException("Entity not found");
+
+            return entity;
         }
 
         public async Task<T> AddAsync(T entity)

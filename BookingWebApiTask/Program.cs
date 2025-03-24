@@ -1,4 +1,11 @@
 
+using BookingWebApiTask.Application.Interfaces;
+using BookingWebApiTask.Application.Mapper;
+using BookingWebApiTask.Domain.Data;
+using BookingWebApiTask.Domain.Entities;
+using BookingWebApiTask.Infrastructure.Repository;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NSwag.Generation.Processors.Security;
 
 namespace BookingWebApiTask
@@ -10,8 +17,18 @@ namespace BookingWebApiTask
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddDbContext<ApplicationDbContext>(option =>
+            {
+                option.UseSqlServer(builder.Configuration.GetConnectionString("BookingDatabase"));
+            });
+
+            // register services
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped(typeof(IBaseRepository<,>), typeof(BaseRepository<,>));
+            builder.Services.AddScoped<IPasswordHasher<ApplicationUser>, PasswordHasher<ApplicationUser>>();
 
             builder.Services.AddControllers();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             //builder.Services.AddOpenApi();
             builder.Services.AddOpenApiDocument(option =>
@@ -26,6 +43,8 @@ namespace BookingWebApiTask
                 });
                 option.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
             });
+            // register AutoMapper
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             var app = builder.Build();
 
@@ -41,7 +60,6 @@ namespace BookingWebApiTask
 
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 
