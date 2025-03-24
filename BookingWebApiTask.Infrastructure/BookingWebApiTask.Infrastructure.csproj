@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BookingWebApiTask.Application\BookingWebApiTask.Application.csproj" />
+    <ProjectReference Include="..\BookingWebApiTask.Domain\BookingWebApiTask.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
