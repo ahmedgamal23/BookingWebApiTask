@@ -16,7 +16,7 @@ namespace BookingWebApiTask.Application.Interfaces
             int pageSize = 5
         );
 
-        public Task<T> GetAsync(
+        public Task<T?> GetAsync(
             TType id,
             Func<IQueryable<T>, IQueryable<T>>? include = null
         );

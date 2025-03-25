@@ -23,11 +23,6 @@ namespace BookingWebApiTask.Infrastructure.Repository
 
         public async Task<IEnumerable<T>> GetAllAsync(Func<IQueryable<T>, IQueryable<T>>? include = null, Expression<Func<T, bool>>? filter = null, int pageNumber = 1, int pageSize = 5)
         {
-            if(pageSize < 0 || pageNumber < 0)
-            {
-                throw new ArgumentException("Invalid page number or page size");
-            }
-
             IQueryable<T> query = _dbSet;
 
             if (include != null)
@@ -42,20 +37,17 @@ namespace BookingWebApiTask.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<T> GetAsync(TType id, Func<IQueryable<T>, IQueryable<T>>? include = null)
+        public async Task<T?> GetAsync(TType id, Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             IQueryable<T> query = _dbSet;
 
-            // Apply includes if provided
             if (include != null)
                 query = include(query);
 
-            // Retrieve the entity
             var entity = await query.FirstOrDefaultAsync(e => EF.Property<TType>(e, "Id")!.Equals(id));
 
-            // Check if the entity is null
-            if (entity == null)
-                throw new KeyNotFoundException("Entity not found");
+            //if (entity == null)
+            //    throw new KeyNotFoundException("Entity not found");
 
             return entity;
         }

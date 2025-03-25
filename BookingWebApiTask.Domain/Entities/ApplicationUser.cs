@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,19 +8,9 @@ using System.Threading.Tasks;
 
 namespace BookingWebApiTask.Domain.Entities
 {
-    public class ApplicationUser
+    public class ApplicationUser:IdentityUser
     {
-        [Key]
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-
         [Required]
         public string Name { get; set; } = string.Empty;
-
-        [Required]
-        public string Email { get; set; } = string.Empty;
-
-        [Required]
-        public string Password { get; set; } = string.Empty;
-
     }
 }

@@ -1,11 +1,9 @@
-﻿using AutoMapper;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using BookingWebApiTask.Application.Interfaces;
 using BookingWebApiTask.Domain.Entities;
 using BookingWebApiTask.Domain.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
+using AutoMapper;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,42 +13,35 @@ namespace BookingWebApiTask.Controllers
     [ApiController]
     public class IdentityController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-        private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
 
-        public IdentityController(
-            IUnitOfWork unitOfWork,
-            IMapper mapper,
-            IPasswordHasher<ApplicationUser> passwordHasher)
+        public IdentityController(UserManager<ApplicationUser> userManager, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _userManager = userManager;
             _mapper = mapper;
-            _passwordHasher = passwordHasher;
         }
 
         [HttpGet("GetAllUsers")]
-        public async Task<IActionResult> GetAllUsers()
+        public IActionResult GetAllUsers()
         {
-            var users = await _unitOfWork.ApplicationUser.GetAllAsync();
-            return users.Any() ? Ok(users) : NotFound("No users found.");
+            var users = _userManager.Users.ToList();
+            var result = _mapper.Map<IEnumerable<IdentityUserResult>>(users);
+            return result.Any() ? Ok(result) : NotFound("No users found.");
         }
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            if (loginDto == null)
+            if (!ModelState.IsValid)
                 return BadRequest("Invalid login request.");
 
-            var users = await _unitOfWork.ApplicationUser.GetAllAsync(filter:x => x.Email == loginDto.Email);
-            var user = users.FirstOrDefault();
-
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
                 return NotFound("User not found.");
 
-            var passwordVerification = _passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
-
-            if (passwordVerification == PasswordVerificationResult.Failed)
+            bool check = await _userManager.CheckPasswordAsync(user, loginDto.PasswordHash);
+            if (!check)
                 return BadRequest("Invalid password.");
 
             return Ok(new { message = "Login successful", user.Email });
@@ -62,22 +53,20 @@ namespace BookingWebApiTask.Controllers
             if (!ModelState.IsValid)
                 return BadRequest("Invalid registration data.");
 
-            bool userExists = (await _unitOfWork.ApplicationUser.GetAllAsync(filter: x => x.Email == registerDto.Email)).Any();
-            if (userExists)
+            var userExists = await _userManager.FindByEmailAsync(registerDto.Email);
+            if (userExists != null)
                 return BadRequest("User already exists.");
 
-            ApplicationUser user = _mapper.Map<ApplicationUser>(registerDto);
-            user.Password = _passwordHasher.HashPassword(user, registerDto.Password);
+            var user = _mapper.Map<ApplicationUser>(registerDto);
+            user.UserName = registerDto.Email;
 
-            await _unitOfWork.ApplicationUser.AddAsync(user);
-            int rows = await _unitOfWork.SaveChangesAsync();
-
-            if (rows > 0)
+            var result = await _userManager.CreateAsync(user, registerDto.PasswordHash);
+            if (result.Succeeded)
             {
                 return Ok(new { message = "Registration successful", user.Email });
             }
 
-            return BadRequest("Registration failed.");
+            return BadRequest(result.Errors);
         }
     }
 }

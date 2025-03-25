@@ -51,16 +51,16 @@ namespace BookingWebApiTask.Controllers
         }
 
         [HttpPost("AddReservation")]
-        public async Task<IActionResult> AddReservation([FromBody] ReservationDto reservationDto)
+        public async Task<IActionResult> AddReservation([FromForm] ReservationDto reservationDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var reservedUser = await _unitOfWork.ApplicationUser.GetAsync(reservationDto.ReservedById);
+            var reservedUser = await _unitOfWork.ApplicationUser.GetAsync(reservationDto.ReservedById!);
             if (reservedUser == null)
                 return NotFound($"reservation with ID {reservationDto.ReservedById} not found.");
 
-            var trip = await _unitOfWork.Trip.GetAsync(reservationDto.TripId);
+            var trip = await _unitOfWork.Trip.GetAsync((int)reservationDto.TripId!);
             if (trip == null)
                 return NotFound($"Trip with ID {reservationDto.TripId} not found.");
 
@@ -73,13 +73,18 @@ namespace BookingWebApiTask.Controllers
 
             int rows = await _unitOfWork.SaveChangesAsync();
             if (rows > 0)
-                return CreatedAtAction(nameof(GetReservation), new { id = reservation.Id }, reservation);
-
+            {
+                return CreatedAtAction(
+                    nameof(GetReservation),
+                    new { id = reservation.Id },
+                    _mapper.Map<ReservationResult>(reservation)
+                );
+            }
             return BadRequest("Failed to save changes.");
         }
 
         [HttpPut("UpdateReservation/{id}")]
-        public async Task<IActionResult> UpdateReservation([FromRoute]int id, [FromBody] ReservationDto reservationDto)
+        public async Task<IActionResult> UpdateReservation([FromRoute] int id, [FromForm] ReservationDto reservationDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -88,22 +93,28 @@ namespace BookingWebApiTask.Controllers
             if (existingReservation == null)
                 return NotFound($"Reservation with ID {id} not found.");
 
-            var reservedUser = await _unitOfWork.ApplicationUser.GetAsync(reservationDto.ReservedById);
+            var reservedUserId = reservationDto.ReservedById ?? existingReservation.ReservedById;
+            var reservedUser = await _unitOfWork.ApplicationUser.GetAsync(reservedUserId);
             if (reservedUser == null)
-                return NotFound($"reservation with ID {reservationDto.ReservedById} not found.");
+                return NotFound($"User with ID {reservedUserId} not found.");
 
-            var trip = await _unitOfWork.Trip.GetAsync(existingReservation.TripId);
-            if (trip == null)
+            existingReservation.ReservedUser = reservedUser;
+
+            var tripId = existingReservation.TripId;
+            if(reservationDto.TripId != null && reservationDto.TripId !=0)
+                tripId = (int)reservationDto.TripId;
+            var reservedTrip = await _unitOfWork.Trip.GetAsync(tripId);
+            if (reservedTrip == null)
                 return NotFound($"Trip with ID {reservationDto.TripId} not found.");
+            existingReservation.Trip = reservedTrip;
 
-            var updatedReservation = _mapper.Map(reservationDto, existingReservation);
-            updatedReservation.Trip = trip;
-
-            _unitOfWork.Reservation.Update(updatedReservation);
+            _mapper.Map(reservationDto, existingReservation);
+            
+            _unitOfWork.Reservation.Update(existingReservation);
 
             int rows = await _unitOfWork.SaveChangesAsync();
             if (rows > 0)
-                return Ok(updatedReservation);
+                return Ok(new { message = "Update Successfully", data = _mapper.Map<ReservationResult>(existingReservation) });
 
             return BadRequest("Failed to update reservation.");
         }

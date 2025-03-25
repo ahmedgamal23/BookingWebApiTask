@@ -5,20 +5,16 @@ namespace BookingWebApiTask.Application.Dtos
 {
     public class ReservationDto
     {
-        [Required]
-        public string ReservedById { get; set; } = string.Empty;
+        public string? ReservedById { get; set; }
 
-        [Required, MaxLength(200)]
-        public string CustomerName { get; set; } = string.Empty;
+        public string? CustomerName { get; set; }
 
-        [Required]
-        public int TripId { get; set; }
+        public int? TripId { get; set; }
 
         public string? Notes { get; set; }
 
-        [Required]
         public DateTime ReservationDate { get; set; }
 
-        public DateTime CreationDate { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now;
     }
 }

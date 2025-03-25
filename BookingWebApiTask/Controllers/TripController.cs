@@ -37,7 +37,7 @@ namespace BookingWebApiTask.Controllers
         {
             var result = await _unitOfWork.Trip.GetAsync(id);
             if (result == null)
-                return NotFound();
+                return NotFound($"This id not exist {id}");
             return Ok(result);
         }
 
@@ -64,20 +64,17 @@ namespace BookingWebApiTask.Controllers
         [HttpPut("UpdateTrip/{id}")]
         public async Task<IActionResult> UpdateTrip([FromRoute] int id, [FromForm] TripDto tripDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(tripDto);
-            Trip oldTrip = await _unitOfWork.Trip.GetAsync(id);
+            Trip? oldTrip = await _unitOfWork.Trip.GetAsync(id);
+            if (oldTrip == null)
+                return NotFound();
+
             if (tripDto.ImageFile != null)
             {
-                // delete old image
                 ImageServices.DeleteImage(oldTrip.ImageUrl, _hostEnvironment.WebRootPath);
-
-                // save new image
                 oldTrip.ImageUrl = await ImageServices.SaveImageAsync(tripDto.ImageFile, _hostEnvironment.WebRootPath);
             }
-            tripDto.ImageUrl = oldTrip.ImageUrl;
-
             _mapper.Map(tripDto, oldTrip);
+            
             var result = _unitOfWork.Trip.Update(oldTrip);
             if (result != null)
             {
@@ -85,8 +82,10 @@ namespace BookingWebApiTask.Controllers
                 if (rows > 0)
                     return Ok(result);
             }
+
             return BadRequest();
         }
+
 
         [HttpDelete("DeleteTrip/{id}")]
         public async Task<IActionResult> DeleteTrip([FromRoute] int id)
@@ -95,7 +94,6 @@ namespace BookingWebApiTask.Controllers
             if (trip == null)
                 return NotFound();
 
-            // Delete image using IWebHostEnvironment
             ImageServices.DeleteImage(trip.ImageUrl, _hostEnvironment.WebRootPath);
 
             await _unitOfWork.Trip.DeleteAsync(trip);

@@ -3,6 +3,7 @@ using BookingWebApiTask.Application.Interfaces;
 using BookingWebApiTask.Application.Mapper;
 using BookingWebApiTask.Domain.Data;
 using BookingWebApiTask.Domain.Entities;
+using BookingWebApiTask.Domain.SeedData;
 using BookingWebApiTask.Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace BookingWebApiTask
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,17 @@ namespace BookingWebApiTask
             {
                 option.UseSqlServer(builder.Configuration.GetConnectionString("BookingDatabase"));
             });
+
+            // regsiter Identity
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 5;
+            }).AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddDefaultTokenProviders();
 
             // register services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -47,6 +59,12 @@ namespace BookingWebApiTask
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             var app = builder.Build();
+
+            using(var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                await SeedData.Seed(services);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

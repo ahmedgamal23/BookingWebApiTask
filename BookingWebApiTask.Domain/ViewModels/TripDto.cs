@@ -6,17 +6,13 @@ namespace BookingWebApiTask.Application.Dtos
 {
     public class TripDto
     {
-        [Required, MaxLength(200)]
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
 
-        [Required, MaxLength(200)]
-        public string CityName { get; set; } = string.Empty;
+        public string? CityName { get; set; }
 
-        [Required]
-        public double Price { get; set; }
+        public double? Price { get; set; }
 
-        [Required]
-        public string Content { get; set; } = string.Empty;
+        public string? Content { get; set; }
 
         public DateTime CreationDate { get; set; } = DateTime.Now;
 
