@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingWebApiTask", "BookingWebApiTask\BookingWebApiTask.csproj", "{35DEAA2F-3EA3-4BA3-ADAD-14438F2EFE18}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingWebApiTask.Domain", "BookingWebApiTask.Domain\BookingWebApiTask.Domain.csproj", "{B3FFAAAE-679D-4F0E-933F-CE866E5AF871}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingWebApiTask.Infrastructure", "BookingWebApiTask.Infrastructure\BookingWebApiTask.Infrastructure.csproj", "{8087904B-AF9F-4CCF-A505-5782A2C545E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingWebMVCTask", "BookingWebMVCTask\BookingWebMVCTask.csproj", "{9184EC7E-8C08-44F4-A28F-54C194A79983}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{8087904B-AF9F-4CCF-A505-5782A2C545E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8087904B-AF9F-4CCF-A505-5782A2C545E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8087904B-AF9F-4CCF-A505-5782A2C545E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9184EC7E-8C08-44F4-A28F-54C194A79983}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9184EC7E-8C08-44F4-A28F-54C194A79983}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9184EC7E-8C08-44F4-A28F-54C194A79983}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9184EC7E-8C08-44F4-A28F-54C194A79983}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

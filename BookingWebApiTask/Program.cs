@@ -58,6 +58,17 @@ namespace BookingWebApiTask
             // register AutoMapper
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+            // add cors
+            builder.Services.AddCors(option =>
+            {
+                option.AddPolicy("AllowAll", policy =>
+                {
+                    policy.WithOrigins("https://localhost:44328")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
             var app = builder.Build();
 
             using(var scope = app.Services.CreateScope())
@@ -74,6 +85,7 @@ namespace BookingWebApiTask
                 app.UseSwaggerUi();
             }
 
+            app.UseCors("AllowAll");
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
