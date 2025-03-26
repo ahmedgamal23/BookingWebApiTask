@@ -16,6 +16,9 @@ Version Control: Git & GitHub
 
 ![Screenshot (604)](https://github.com/user-attachments/assets/93243025-3a99-41cf-bfda-119c8ad74f80)
 
-![Screenshot (605)](https://github.com/user-attachments/assets/3b40976a-e9f6-4bf3-a6f8-cb928c6f80ed)
+![Screenshot (607)](https://github.com/user-attachments/assets/1b7de54a-a028-4e34-8c54-f9410964335e)
 
-![Screenshot (606)](https://github.com/user-attachments/assets/0e1304ab-c191-4223-bc0c-7d303cde055b)
+![Screenshot (609)](https://github.com/user-attachments/assets/be9c8557-d3e5-44df-9211-f3614582bade)
+
+![Screenshot (608)](https://github.com/user-attachments/assets/f0369236-f17c-4f36-bae1-ec8a5cf64490)
+
