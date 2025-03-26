@@ -44,6 +44,7 @@
             });
 
             if (!response.ok) {
+                allReservation.style.display = "none";
                 throw new Error("Failed to retrieve reservations");
             }
 
@@ -55,10 +56,12 @@
                 return;
             }
 
+            allReservation.style.display = "block";
             showAlert("Reservations retrieved successfully!", "success");
             displayReservations(data);
         } catch (error) {
             showAlert(error.message, "danger");
+            allReservation.style.display = "none";
             console.error("Reservation Error:", error);
         }
     }
@@ -78,19 +81,23 @@
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to retrieve reservation. (Status: ${response.status})`);
+                allReservation.style.display = "none";
+                throw new Error(`Failed to retrieve reservation ${reservationId}. (Status: ${response.status})`);
             }
 
             const data = await response.json();
             if (!data) {
+                allReservation.style.display = "none";
                 showAlert("Reservation not found.", "warning");
                 return;
             }
 
+            allReservation.style.display = "block";
             showAlert("Reservation retrieved successfully!", "success");
             displayReservations([data]); // Convert object to array
         } catch (error) {
             showAlert(error.message, "danger");
+            allReservation.style.display = "none";
             console.error("Reservation Error:", error);
         }
     }
